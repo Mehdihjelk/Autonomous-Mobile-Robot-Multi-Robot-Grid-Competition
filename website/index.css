@@ -1,0 +1,152 @@
+:root{
+    --maincolor: rgb(69, 65, 84);
+    --lighter: rgb(104, 99, 121);
+    --light: rgb(83, 79, 98);
+    --accent: rgb(142, 206, 173);
+    --alerte: rgb(224, 122, 122);
+    --texte: rgb(242, 241, 246);
+    --texte-doux: rgb(178, 174, 192);
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    background-color: var(--maincolor);
+    color: var(--texte);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+}
+
+h1, h2 { padding: 0; margin: 0; }
+
+.main {
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-direction: column;
+    padding-bottom: 3rem;
+}
+
+header {
+    border-bottom: solid 1px var(--lighter);
+    padding: 2rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.header-title { color: var(--texte); font-size: 1.5rem; text-align: center; }
+.titre-bloc { font-size: 1.1rem; color: var(--texte); margin-bottom: 0.3rem; }
+.aide { color: var(--texte-doux); font-size: 0.85rem; margin: 0.3rem 0; }
+
+.bloc {
+    width: min(42rem, 92vw);
+    background-color: var(--light);
+    border: solid 1px var(--lighter);
+    border-radius: 1rem;
+    padding: 1.2rem 1.5rem;
+    box-sizing: border-box;
+}
+
+.ligne {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.6rem;
+}
+
+label { color: var(--texte-doux); font-size: 0.85rem; }
+
+input {
+    background-color: var(--maincolor);
+    border: solid 1px var(--lighter);
+    border-radius: 0.5rem;
+    color: var(--texte);
+    padding: 0.5rem 0.7rem;
+    font-size: 1rem;
+    width: 9rem;
+}
+input:focus { outline: solid 2px var(--accent); }
+
+.bouton {
+    background-color: var(--lighter);
+    color: var(--texte);
+    border: none;
+    border-radius: 0.6rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition-duration: 0.15s;
+}
+.bouton:hover { background-color: var(--accent); color: var(--maincolor); }
+.bouton-stop:hover { background-color: var(--alerte); color: var(--texte); }
+
+/* ------------------------------------------------------------ pilotage manuel */
+.control-pad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+}
+.pad-ligne { display: flex; gap: 0.5rem; justify-content: center; }
+
+.key {
+    width: 4rem;
+    height: 4rem;
+    background-color: var(--lighter);
+    border-radius: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    touch-action: none;
+    transition-duration: 0.1s;
+}
+.key:hover { background-color: var(--accent); }
+.key:active { background-color: var(--accent); transform: scale(0.94); }
+.key-emoji { font-size: 1.6rem; user-select: none; }
+
+/* ---------------------------------------------------------------------- état */
+.etat-grille {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+}
+.etat-case {
+    background-color: var(--maincolor);
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.etat-nom { color: var(--texte-doux); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.etat-valeur { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+
+.message {
+    margin-top: 0.9rem;
+    padding: 0.6rem 0.8rem;
+    background-color: var(--maincolor);
+    border-left: solid 3px var(--accent);
+    border-radius: 0.4rem;
+    font-size: 0.9rem;
+    color: var(--texte-doux);
+}
+
+.pastille {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 1rem;
+    background-color: var(--lighter);
+    color: var(--texte-doux);
+}
+.pastille-ok { background-color: var(--accent); color: var(--maincolor); }
+.pastille-ko { background-color: var(--alerte); color: var(--texte); }

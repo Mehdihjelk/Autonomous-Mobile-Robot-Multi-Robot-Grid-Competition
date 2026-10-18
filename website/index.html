@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot team1 — contrôle</title>
+    <link rel="stylesheet" href="index.css"/>
+</head>
+<body>
+    <div class="main">
+        <header>
+            <h1 class="header-title">Serveur de contrôle — robot team1</h1>
+            <div class="ligne">
+                <label for="mdp-input">Mot de passe</label>
+                <input type="password" id="mdp-input" placeholder="mot de passe" value="bonjour"/>
+                <span id="lien" class="pastille">connexion…</span>
+            </div>
+        </header>
+
+        <!-- ------------------------------------------------ pilotage manuel -->
+        <section class="bloc">
+            <h2 class="titre-bloc">Pilotage manuel</h2>
+            <p class="aide">Flèches du clavier ou boutons. Le robot s'arrête dès que la touche est relâchée.</p>
+            <div class="control-pad">
+                <div class="pad-ligne">
+                    <div class="key" data-direction="Avancer"><span class="key-emoji">↑</span></div>
+                </div>
+                <div class="pad-ligne">
+                    <div class="key" data-direction="Gauche"><span class="key-emoji">←</span></div>
+                    <div class="key" data-direction="Stop"><span class="key-emoji">■</span></div>
+                    <div class="key" data-direction="Droite"><span class="key-emoji">→</span></div>
+                </div>
+                <div class="pad-ligne">
+                    <div class="key" data-direction="Reculer"><span class="key-emoji">↓</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ------------------------------------------------------ navigation -->
+        <section class="bloc">
+            <h2 class="titre-bloc">Rejoindre une case</h2>
+            <div class="ligne">
+                <input type="text" id="case-input" placeholder="C3" maxlength="2"/>
+                <button class="bouton" id="aller-case">Y aller</button>
+            </div>
+        </section>
+
+        <!-- --------------------------------------------------------- épreuves -->
+        <section class="bloc">
+            <h2 class="titre-bloc">Mode autonome</h2>
+            <div class="ligne">
+                <button class="bouton bouton-epreuve" data-epreuve="0">
+                    1️⃣ Balayage — 2 dernières colonnes
+                </button>
+                <button class="bouton bouton-epreuve" data-epreuve="1">
+                    2️⃣ Balayage — grille complète
+                </button>
+                <button class="bouton bouton-stop" id="arret">⏹ Tout arrêter</button>
+            </div>
+        </section>
+
+        <!-- ------------------------------------------------------------- état -->
+        <section class="bloc">
+            <h2 class="titre-bloc">État du robot</h2>
+            <div class="etat-grille">
+                <div class="etat-case"><span class="etat-nom">Case</span><span class="etat-valeur" id="e-case">—</span></div>
+                <div class="etat-case"><span class="etat-nom">x (cm)</span><span class="etat-valeur" id="e-x">—</span></div>
+                <div class="etat-case"><span class="etat-nom">y (cm)</span><span class="etat-valeur" id="e-y">—</span></div>
+                <div class="etat-case"><span class="etat-nom">Cap</span><span class="etat-valeur" id="e-cap">—</span></div>
+                <div class="etat-case"><span class="etat-nom">Incertitude</span><span class="etat-valeur" id="e-inc">—</span></div>
+                <div class="etat-case"><span class="etat-nom">Moteurs</span><span class="etat-valeur" id="e-simu">—</span></div>
+            </div>
+            <p class="message" id="e-message">—</p>
+            <p class="aide">Drapeaux déclarés : <span id="e-drapeaux">aucun</span></p>
+            <p class="aide">Cases infranchissables : <span id="e-bloquees">aucune</span></p>
+        </section>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
