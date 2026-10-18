@@ -1,44 +1,46 @@
 # Protocole d'arbitrage par baux de cases
 
-Stratégie de groupe pour l'épreuve multi-robots de PROJ103.
-Remplace la planification « a priori » décrite dans `readme_global.md`.
+Stratégie de coordination multi-robots pour l'épreuve de groupe de PROJ103.
 
 ---
 
-## 1. Pourquoi changer de stratégie
+## 1. Pourquoi l'exclusion mutuelle
 
-La stratégie de janvier 2025 reposait sur un planificateur central qui modélisait
-toutes les situations possibles par un graphe d'états orienté, calculait les plus
-courts chemins par Floyd-Warshall sur une profondeur de 8, puis répartissait les
-robots par backtracking « vers des endroits non visités sans qu'ils se croisent ».
+L'approche intuitive pour coordonner plusieurs robots consiste à **planifier des
+trajectoires qui ne se croisent pas** : modéliser les situations possibles par un
+graphe d'états, calculer les plus courts chemins (Floyd-Warshall par exemple),
+puis répartir les robots par backtracking vers les zones non visitées.
 
-L'intention était bonne. Trois failles la rendaient néanmoins **structurellement
-incapable** de garantir l'absence de collision.
+Elle a été écartée. Dans ce contexte précis, elle est **structurellement
+incapable** de garantir l'absence de collision, pour trois raisons.
 
-### Faille 1 — planifier sur des données fausses
-Le modèle du monde venait de l'odométrie remontée par chaque robot. Cette
-odométrie dérive, et rien ne bornait cette dérive. Un planificateur qui raisonne
-sur des positions erronées produit des trajectoires « sans croisement » dans son
-modèle, et des collisions sur le terrain.
+### 1. Le planificateur raisonnerait sur des données fausses
 
-### Faille 2 — la tolérance aux pannes fabriquait des obstacles invisibles
-`readme_global.md` présentait ceci comme une force :
+Son modèle du monde ne peut venir que de l'odométrie remontée par chaque robot.
+Elle dérive, et rien ne la borne naturellement. Un planificateur qui raisonne sur
+des positions erronées produit des trajectoires sans croisement *dans son
+modèle*, et des collisions sur le terrain.
 
-> « la panne d'un robot n'influence pas l'algorithme central […] **le robot ne
-> sera pas pris en compte par l'algorithme** et les drapeaux seront répartis
-> entre les robots qui demandent des instructions »
+### 2. Un robot en panne deviendrait un obstacle invisible
 
-Un robot en panne était donc **retiré du modèle** — alors qu'il restait
-**physiquement posé sur la grille**. Plus un robot tombait en panne, plus le
-planificateur était confiant, et plus il avait tort. L'évitement a priori ne peut
-par construction pas éviter un obstacle dont il ignore l'existence.
+La réaction naturelle face à un robot qui ne répond plus est de le **retirer du
+modèle** et de redistribuer son travail. Sauf qu'il reste **physiquement posé sur
+la grille**. Plus un robot tombe en panne, plus le planificateur devient
+confiant, et plus il a tort. Un évitement *a priori* ne peut pas éviter un
+obstacle dont il ignore l'existence.
 
-### Faille 3 — aucune rétroaction du monde physique
-Les robots n'ont qu'un seul capteur, la caméra, et son filtre ne retenait que les
-drapeaux : les autres robots étaient littéralement invisibles. Aucun mécanisme ne
-permettait au terrain de contredire la carte. En cas de collision, la boucle
-d'asservissement poussait indéfiniment (la sécurité firmware ne se déclenchait
-jamais, puisqu'un ordre partait toutes les 10 ms).
+### 3. Rien ne permettrait au terrain de contredire la carte
+
+Les robots n'ont qu'un seul capteur, la caméra, et les autres robots ne portent
+pas de marqueur : ils sont littéralement invisibles les uns pour les autres. Sans
+boucle de rétroaction physique, une erreur du modèle ne se corrige jamais.
+
+### Et le problème est difficile en soi
+
+*Optimiser le parcours de k robots sur un graphe vers certains sommets sans
+qu'ils s'intersectent* est un problème dur. En faire dépendre la sûreté, c'est
+faire dépendre la sûreté d'un algorithme qu'on n'a ni le temps ni les moyens de
+prouver.
 
 ---
 
@@ -85,8 +87,8 @@ avoir confirmé son arrivée en B.
 | **Pas d'échange tête-à-tête** | détenir sa source pendant le transit | R1 en A veut B, R2 en B veut A : chacun détient sa propre case, donc aucun n'obtient celle de l'autre. C'est le cas que la seule réservation de destination laisse passer. |
 | **Pas d'interblocage** | refus non bloquant | Un refus ne met jamais un robot en attente : il garde sa case, état sûr à un seul bail, et retentera éventuellement ailleurs. Aucun cycle d'attente ne peut se former. |
 | **Pas de famine** | vieillissement des priorités | Chaque refus incrémente la priorité du demandeur ; une case libérée va au prétendant le plus ancien. L'attente est bornée. |
-| **Panne sûre** | quarantaine, pas libération | Un bail dont les battements cessent passe en `QUARANTAINE`. **Corrige directement la faille 2.** |
-| **Rétroaction physique** | signalement de blocage | Un robot bloqué déclare la case visée, qui passe en quarantaine. **Corrige la faille 3.** |
+| **Panne sûre** | quarantaine, pas libération | Un bail dont les battements cessent passe en `QUARANTAINE`. **C'est le point clé de la panne sûre.** |
+| **Rétroaction physique** | signalement de blocage | Un robot bloqué déclare la case visée, qui passe en quarantaine. **C'est la seule rétroaction physique disponible.** |
 | **Dérive bornée** | budget d'incertitude | Au-delà d'une demi-case d'incertitude, plus aucun bail n'est accordé : le robot doit d'abord se recaler sur un repère fixe. **Corrige la faille 1**, et c'est ce qui maintient vraie la seconde moitié de l'invariant. |
 
 ### Le point d'architecture le plus important
@@ -94,7 +96,7 @@ avoir confirmé son arrivée en B.
 La sûreté **ne dépend plus du planificateur**. Celui de `prochaine_cible()` est
 volontairement trivial : un parcours en largeur vers la case inexplorée la plus
 proche. On peut le remplacer par n'importe quoi — y compris par le Floyd-Warshall
-d'origine — sans jamais risquer une collision. La correction et la performance
+sur graphe d'états — sans jamais risquer une collision. Correction et performance
 sont devenues deux problèmes séparés.
 
 ---
@@ -156,8 +158,9 @@ Tout en HTTP + JSON. Chaque requête porte `{"id": "<robot>"}`.
 ```
 
 **Règle de sûreté du client** : un serveur injoignable ne vaut **jamais**
-permission. Le robot s'arrête. C'est l'inverse du comportement d'origine, où un
-serveur muet laissait le robot continuer sur sa dernière instruction.
+permission. Le robot s'arrête. Le défaut par défaut est le refus, jamais
+l'autorisation tacite : un robot qui continue sur sa dernière instruction pendant
+que l'arbitre est muet roule sans arbitrage.
 
 ---
 

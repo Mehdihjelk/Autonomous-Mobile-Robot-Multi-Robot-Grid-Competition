@@ -110,7 +110,7 @@ La bascule est automatique.
 
 Le robot n'a aucun capteur d'obstacle : la caméra ne voit que les marqueurs, et
 les autres robots n'en portent pas. La seule détection possible est le blocage
-des roues, et elle est désormais implémentée :
+des roues :
 
 - **Détection de blocage** — si les encodeurs n'avancent plus alors que les
   moteurs sont commandés, `RobotBloque` est levée et les moteurs sont arrêtés.
